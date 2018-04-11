@@ -1,0 +1,49 @@
+#include "SevSeg.h"
+SevSeg sevseg; 
+byte Pin6=digitalRead(6);
+void setup() 
+{
+  byte numDigits = 4;
+  byte digitPins[] = {5, 4, 3, 2};
+  byte segmentPins[] = {8, 9, 10, 11,12, 13, 14};
+  bool resistorsOnSegments = false; // 'false' means resistors are on digit pins
+  byte hardwareConfig = COMMON_CATHODE; // See README.md for options
+  bool updateWithDelays = false; // Default. Recommended
+  bool leadingZeros = false; // Use 'true' if you'd like to keep the leading zeros
+  
+  sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros);
+  sevseg.setBrightness(90);
+}
+
+void loop() 
+{ 
+  static unsigned long timer = millis();
+  static int deciSeconds = 0;
+  sevseg.setNumber(deciSeconds, 3);
+  
+  if (millis() - timer >= 300) 
+  {
+    timer +=300;
+  if(deciSeconds%100 == 59)
+    {
+      deciSeconds=deciSeconds+41;
+    }
+   else
+    {
+      deciSeconds=deciSeconds+1;
+    }
+    
+    if (deciSeconds == 2400) 
+    { 
+      deciSeconds=0;
+    }
+    if(Pin6==LOW)
+    {
+      deciSeconds = 0;
+    }
+  }
+
+  sevseg.refreshDisplay(); // Must run repeatedly
+}
+
+/// END ///
